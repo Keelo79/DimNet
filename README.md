@@ -4,7 +4,7 @@
 
 `convNd.py` 文件代码来自 [pvjosue/pytorch_convNd](https://github.com/pvjosue/pytorch_convNd)
 
-## 什么都不改，直接运行
+## 如果什么都不改，直接运行
 
 直接运行 `train.py` 即可。
 
