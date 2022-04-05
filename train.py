@@ -9,6 +9,7 @@ import torch.backends.cudnn as cudnn
 from torch.utils.data import DataLoader, Dataset
 import h5py
 from torch.autograd import Variable
+from test import test
 
 
 def parse_args():
@@ -16,7 +17,7 @@ def parse_args():
     parser.add_argument('--device', type=str, default='cuda:0')
     parser.add_argument("--upscale_factor", type=int, default=4, help="upscale factor")
 
-    parser.add_argument('--batch_size', type=int, default=4)
+    parser.add_argument('--batch_size', type=int, default=1)
     parser.add_argument('--lr', type=float, default=5e-4, help='initial learning rate')
     parser.add_argument('--n_epochs', type=int, default=100, help='number of epochs to train')
     parser.add_argument('--n_steps', type=int, default=25, help='number of epochs to update learning rate')
@@ -25,6 +26,8 @@ def parse_args():
     parser.add_argument('--trainset_dir', type=str, default='./data')
     parser.add_argument('--model_name', type=str, default='LF-DimNet_5x5_4xSR.pth.tar')
     parser.add_argument('--load_pretrain', type=bool, default=True)
+
+    parser.add_argument('--num_works', type=int, default=1)
 
     return parser.parse_args()
 
@@ -89,7 +92,7 @@ if __name__ == '__main__':
         best = 1
     train_set = TrainSetLoader(cfg.trainset_dir)
     train_loader = DataLoader(dataset=train_set,
-                              num_workers=1,
+                              num_workers=cfg.num_works,
                               batch_size=cfg.batch_size,
                               shuffle=True)
     criterion_Loss = torch.nn.L1Loss().to(cfg.device)
@@ -97,8 +100,7 @@ if __name__ == '__main__':
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=cfg.n_steps, gamma=cfg.gamma)
 
     for idx_epoch in range(cfg.n_epochs):
-
-        for idx_iter, (data, label) in enumerate(train_loader):
+        for idx_iter, (data, label) in enumerate(train_loader,1):
             data, label = Variable(data).to(cfg.device), Variable(label).to(cfg.device)
             out = net(data)
             loss = criterion_Loss(out, label)
@@ -107,10 +109,8 @@ if __name__ == '__main__':
             optimizer.step()
 
         scheduler.step()
-
-        print(idx_epoch)
-        print(loss.data.cpu())
-        print(best)
-        if loss.data.cpu() < best:
-            best = loss.data.cpu()
+        loss_ave,time_ave=test(net)
+        print(idx_epoch,loss_ave,best)
+        if loss_ave < best:
+            best = loss_ave
             save(cfg.model_name, best)
