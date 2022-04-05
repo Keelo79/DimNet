@@ -6,10 +6,6 @@ import cv2
 import os
 import time
 
-net = DimNet(upscale_factor=4, device='cuda:0')
-weight = torch.load('LF-DimNet_5x5_4xSR.pth.tar')
-net.load_state_dict(weight['net'])
-
 def test(net):
     ave_score = []
     ave_time = []
@@ -45,6 +41,9 @@ def test(net):
 
 
 if __name__ == '__main__':
+    net = DimNet(upscale_factor=4, device='cuda:0')
+    weight = torch.load('LF-DimNet_5x5_4xSR.pth.tar')
+    net.load_state_dict(weight['net'])
     loss_ave, time_ave = test(net)
     print('average_score=', loss_ave)
     print('average_time=', time_ave)
