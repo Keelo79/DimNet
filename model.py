@@ -114,7 +114,7 @@ class ReconBlock(nn.Module):
         for k in range(size[0]):
             buffer = torch.zeros([1, size[1], size[4], size[5]]).to(self.device)
             buffer[0, :, :, :] = pic_in[k, :, 0, 0, :, :]
-            upscaled = torch.pixel_shuffle(buffer, 4)
+            upscaled = torch.pixel_shuffle(buffer, upscale_factor=self.upscale_factor)
             for i in range(0, 5):
                 out[k, i, :, :, :] = upscaled[0, i * 5:i * 5 + 5, :, :]
         return out
