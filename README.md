@@ -36,6 +36,12 @@
 
 `single_test.py` ：作用是跑单个的图片并且显示出来三张对比图，一个原图、一个低分辨率的图、一个超分的图。
 
+## GenerateTrainingData_4D.m
+
+* 文件夹命名：`./Data/XXX/training/xxx.mat`
+* 生成h5文件时不会覆盖，也不会检查重名，所以若`save_path`里已经有`000001.h5`, 再此运行会报错 文件已存在
+* 若` size(mat)` 不能整除 `label_size `(320) ，则在右下角再取一个h5
+
 ## 其他
 
 * 现在看到的 `LF-DimNet_5x5_4xSR.pth.tar` 是之前跑出来的数据，也就是个随便跑了一下的结果。
