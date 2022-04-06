@@ -25,7 +25,7 @@ def parse_args():
 
     parser.add_argument('--trainset_dir', type=str, default='./data')
     parser.add_argument('--model_name', type=str, default='LF-DimNet_5x5_4xSR.pth.tar')
-    parser.add_argument('--load_pretrain', type=bool, default=True)
+    parser.add_argument('--load_pretrain', type=bool, default=False)
 
     parser.add_argument('--num_works', type=int, default=1)
 
@@ -79,8 +79,8 @@ class TrainSetLoader(Dataset):
 def weights_init_xavier(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
-        m.weight.data.fill_(0.0)
-        # torch.nn.init.zeros_(m.weight.data)
+        # m.weight.data.fill_(0.0)
+        torch.nn.init.zeros_(m.weight.data)
         # torch.nn.init.kaiming_uniform_(m.weight.data)
 
 
