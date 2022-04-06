@@ -28,10 +28,10 @@ class Padder(nn.Module):
 
     def forward(self, pic_in):
         padded_size = list(pic_in.size())
-        padded_size[3] += 4
-        padded_size[4] += 4
+        padded_size[3] += 8
+        padded_size[4] += 8
         out = torch.ones(padded_size).to(self.device) / 2
-        out[:, :, :, 2:padded_size[3] - 2, 2:padded_size[4] - 2] = pic_in
+        out[:, :, :, 4:padded_size[3] - 4, 4:padded_size[4] - 4] = pic_in
         return out
 
 
@@ -54,7 +54,7 @@ class DimBlock_1(nn.Module):
         self.core = convNd(in_channels=1,
                            out_channels=self.upscale_factor ** 2 * 5 ** 2,
                            num_dims=4,
-                           kernel_size=(5, 5, 5, 5),
+                           kernel_size=(5, 5, 9, 9),
                            stride=1,
                            padding=0)
         self.ReLu = nn.ReLU(inplace=True)
@@ -73,13 +73,13 @@ class DimBlock_2(nn.Module):
         self.core_1 = convNd(in_channels=1,
                              out_channels=self.upscale_factor * 5,
                              num_dims=4,
-                             kernel_size=(3, 3, 3, 3),
+                             kernel_size=(3, 3, 5, 5),
                              stride=1,
                              padding=0)
         self.core_2 = convNd(in_channels=self.upscale_factor * 5,
                              out_channels=self.upscale_factor ** 2 * 5 ** 2,
                              num_dims=4,
-                             kernel_size=(3, 3, 3, 3),
+                             kernel_size=(3, 3, 5, 5),
                              stride=1,
                              padding=0)
         self.ReLu = nn.ReLU(inplace=True)
@@ -114,7 +114,7 @@ class ReconBlock(nn.Module):
         for k in range(size[0]):
             buffer = torch.zeros([1, size[1], size[4], size[5]]).to(self.device)
             buffer[0, :, :, :] = pic_in[k, :, 0, 0, :, :]
-            upscaled = torch.pixel_shuffle(buffer, upscale_factor=self.upscale_factor)
+            upscaled = torch.pixel_shuffle(buffer, 4)
             for i in range(0, 5):
                 out[k, i, :, :, :] = upscaled[0, i * 5:i * 5 + 5, :, :]
         return out
